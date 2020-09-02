@@ -1,15 +1,14 @@
-# GraphingLibrary
+# Graphing Library
 
-Simple graphing library in C/C++
+A simple graphing for continuous input streams
 
-## Current Features
+## Features
 
-* Panning and zooming
-* Simple test filter
-* Rendering points
+* Abstractions to handle SDL initialization (not well supported) and user input
+* Graph data class to represent data
 
 ## TODO
 
-* Create graphing library for C++
-  * test more in C first
-* Create SDL abstractions
+* Add filtered graph datas
+* Be able to create references to graph datas that you are passing into the graph
+* More secure SDL code
