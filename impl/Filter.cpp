@@ -17,18 +17,18 @@ double LowPassFilter::operator()(double next)
 MovingAverage::MovingAverage(std::size_t count): count{count}, total{0.0}
 {
     while (values.size() < count)
-        values.push_back(0.0);
+        values.push(0.0);
 }
 double MovingAverage::operator()(double next) 
 {
     // remove the first element and its consideration
     // from the running total
     total -= values.front();
-    values.pop_front();
+    values.pop();
 
     // add the newest element to and add it to the running sum
     total += next;
-    values.push_back(next);
+    values.push(next);
 
     return total / count;
 }

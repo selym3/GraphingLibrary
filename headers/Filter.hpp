@@ -6,7 +6,7 @@ Filter design credits: Sam Belliveau
 
 #include "Timer.hpp"
 
-#include <deque>
+#include <queue>
 #include <cstdint>
 
 namespace mp
@@ -32,7 +32,7 @@ namespace mp
         MovingAverage(std::size_t count);
         virtual double operator()(double next) override; 
     private:
-        std::deque<double> values;
+        std::queue<double> values;
         double total;
 
         std::size_t count;
