@@ -13,7 +13,8 @@ int main(void)
         {
 
         mp::GraphData("Control", 200, 600, 0), 
-        mp::GraphData("LowPassFilter", 200, 600, 0)
+        mp::GraphData("LowPassFilter", 200, 600, 0),
+        mp::GraphData("MovingAverage", 200, 600, 0)
         
         }
     );

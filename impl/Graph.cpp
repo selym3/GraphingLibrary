@@ -195,12 +195,16 @@ void Graph::Insert(double y)
 {
     // test code
     static LowPassFilter lp_filter(0.5);
+    static MovingAverage ma_filter(64);
     for (auto &x : graphs)
-    {
-        if (x.GetTitle() == "Control")
-            x.Insert(y);
-        else
+    {   
+        const std::string& title = x.GetTitle();
+        if (title == "LowPassFilter")
             x.Insert(lp_filter(y));
+        else if (title == "MovingAverage")
+            x.Insert(ma_filter(y));
+        else
+            x.Insert(y);
     }
     // original code
     /*
