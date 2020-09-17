@@ -12,7 +12,17 @@ using namespace mp;
 Graphs can only exist in the same scope as it is coded now.
 */
 
-Graph::Graph(const std::string &title, unsigned int WIDTH, unsigned int HEIGHT, const std::vector<GraphData> &data)
+RenderConfig::RenderConfig(double a , double b): 
+    min { a }, max { b}
+{
+}
+
+RenderConfig::~RenderConfig() {}
+
+double RenderConfig::GetMin() const { return min; }
+double RenderConfig::GetMax() const { return max; }
+
+Graph::Graph(const std::string &title, unsigned int WIDTH, unsigned int HEIGHT, const std::vector<DataQueue> &data)
     : w{WIDTH}, h{HEIGHT}, isRunning{true}
 {
 
@@ -62,7 +72,7 @@ Graph::~Graph()
 
 bool Graph::IsRunning() const { return isRunning; }
 
-void Graph::Update()
+void Graph::Update(const RenderConfig &config)
 {
     bool l = mouse.Get(Mouse::Button::LEFT);
     bool m = mouse.Get(Mouse::Button::MIDDLE);
@@ -147,22 +157,24 @@ void Graph::Update()
     {
         // render the title of the graph somewhere
 
-        const double min = x.GetMin();
+        const double min = config.GetMin();
         const double absolute_min = min * ((min > 0) - (min < 0));
 
-        const double pixels = double(w) / (x.GetMax() - min);
+        const double pixels = double(w) / (config.GetMax() - min);
 
         const int n = x.GetSize();
 
         const double scalar = double(w / n);
 
         double last_x = 0;
-        double last_y = h - x[0];
+        double last_y = h - x.front();
 
-        for (int i = 0; i < n; ++i)
+        int i = 0;
+
+        for (const double &y : x)
         {
-            double current_x = scalar * i;
-            double current_y = h - (pixels * (absolute_min + x[i]));
+            double current_x = scalar * i++;
+            double current_y = h - (pixels * (absolute_min + y));
 
             Vec2 current = camera(Vec2(current_x, current_y));
             Vec2 last = camera(Vec2(last_x, last_y));
@@ -187,64 +199,11 @@ void Graph::Update()
     mouse.Update(Vec2(x, y), l, m, r);
 }
 
-const Mouse &Graph::GetMouse() const { return mouse; }
-const Keyboard &Graph::GetKeyboard() const { return keyboard; }
-
-#include "../headers/Filter.hpp"
 void Graph::Insert(double y)
 {
-    // test code
-    static LowPassFilter lp_filter(0.5);
-    static MovingAverage ma_filter(64);
-    for (auto &x : graphs)
-    {   
-        const std::string& title = x.GetTitle();
-        if (title == "LowPassFilter")
-            x.Insert(lp_filter(y));
-        else if (title == "MovingAverage")
-            x.Insert(ma_filter(y));
-        else
-            x.Insert(y);
-    }
-    // original code
-    /*
-    for (auto &x : graphs)
-        x.Insert(y);
-    */
+    for (auto& x : graphs)
+        x.Update(y);
 }
 
-// GraphData
-
-GraphData::GraphData(const std::string &title, unsigned int size, double maxValue, double minValue)
-    : title{title}, size{size}, max{maxValue}, min{minValue}
-{
-    // values in the back of the deque represent the most recent values
-    // push_back adds
-
-    for (int i = 0; i < size; ++i)
-    {
-        y_values.push_back(0);
-    }
-}
-
-GraphData::~GraphData() {}
-
-void GraphData::Insert(double value)
-{
-    y_values.pop_front();      // O(1) with deque
-    y_values.push_back(value); // O(1) with deque
-
-    // sanity check
-    int n = y_values.size();
-    while (n < size)
-        y_values.push_front(0);
-
-    while (n > size)
-        y_values.pop_front();
-}
-
-double GraphData::GetSize() const { return size; }
-double GraphData::GetMin() const { return min; }
-double GraphData::GetMax() const { return max; }
-const std::string &GraphData::GetTitle() const { return title; }
-double GraphData::operator[](int index) const { return y_values[index]; }
+const Mouse &Graph::GetMouse() const { return mouse; }
+const Keyboard &Graph::GetKeyboard() const { return keyboard; }

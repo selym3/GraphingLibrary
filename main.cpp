@@ -12,13 +12,14 @@ int main(void)
 
         {
 
-        mp::GraphData("Control", 200, 600, 0), 
-        mp::GraphData("LowPassFilter", 200, 600, 0),
-        mp::GraphData("MovingAverage", 200, 600, 0)
+        mp::DataQueue(200), 
+        mp::DataQueue(200, new mp::MovingAverage(24)),
+        mp::DataQueue(200, new mp::LowPassFilter(0.5))
         
         }
     );
 
+    // mp::DataQueue copy_constructor(200, new mp::MovingAverage(24), 0.0);
     /*
     TODO:
         - Add filtering for graph datas
@@ -48,7 +49,7 @@ int main(void)
         if (is_running)
             graph.Insert(y);
         
-        graph.Update();
+        graph.Update(mp::RenderConfig(0,600));
 
         std::cout << "Frames per second: " << (1.0 / timer.Poll()) << "\n";
     }

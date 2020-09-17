@@ -4,10 +4,10 @@
 // contain all the sdl in this file
 
 #include "Camera.hpp"
+#include "DataBuffer.hpp"
 
 #include <string>
 
-#include <deque>
 #include <vector>
 
 #include "Mouse.hpp"
@@ -16,30 +16,17 @@
 namespace mp
 {
 
-    class GraphData
+    struct RenderConfig
     {
-    private:
-        std::deque<double> y_values;
-
-        std::string title;
-
-        unsigned int size;
         double min;
         double max;
 
-    public:
-        GraphData(const std::string &title, unsigned int size, double maxValue, double minValue);
-        ~GraphData();
+        RenderConfig(double maxValue, double minValue);
+        ~RenderConfig();
 
-        void Insert(double value);
-
-        // Getters
-        double GetSize() const;
         double GetMin() const;
         double GetMax() const;
-        const std::string &GetTitle() const;
 
-        double operator[](int index) const;
     };
 
     class Graph
@@ -60,17 +47,21 @@ namespace mp
         mp::Vec2 start_pan, start_zoom;
         unsigned int w, h;
 
+        using ArrayType = std::vector<DataQueue>;
+
         // Graphs
-        std::vector<GraphData> graphs;
+    public:
+        ArrayType graphs;
 
     public:
-        Graph(const std::string &title, unsigned int WIDTH, unsigned int HEIGHT, const std::vector<GraphData> &data);
+        Graph(const std::string& title, unsigned int WIDTH, unsigned int HEIGHT, const ArrayType& data);
         ~Graph();
 
         bool IsRunning() const;
-        void Update();
+        void Update(const RenderConfig&);
 
         void Insert(double y);
+
         const Mouse &GetMouse() const;
         const Keyboard &GetKeyboard() const;
     };
