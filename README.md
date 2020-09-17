@@ -12,3 +12,4 @@ A simple graphing for continuous input streams
 
 * Figure out GUI
 * Come up with test code to simulate how gui might work
+* Fix filters

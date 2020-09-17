@@ -58,9 +58,9 @@ namespace mp
         ~Graph();
 
         bool IsRunning() const;
-        void Update(const RenderConfig&);
+        void Render(const RenderConfig&);
 
-        void Insert(double y);
+        void Update(double y);
 
         const Mouse &GetMouse() const;
         const Keyboard &GetKeyboard() const;

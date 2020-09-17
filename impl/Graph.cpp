@@ -60,6 +60,8 @@ Graph::Graph(const std::string &title, unsigned int WIDTH, unsigned int HEIGHT, 
         throw std::runtime_error("Could not create graph renderer");
 
     graphs = data;
+
+    // std::cout << "length of graphs : " << graphs.size() << "\n";
 }
 
 Graph::~Graph()
@@ -72,7 +74,7 @@ Graph::~Graph()
 
 bool Graph::IsRunning() const { return isRunning; }
 
-void Graph::Update(const RenderConfig &config)
+void Graph::Render(const RenderConfig &config)
 {
     bool l = mouse.Get(Mouse::Button::LEFT);
     bool m = mouse.Get(Mouse::Button::MIDDLE);
@@ -152,9 +154,11 @@ void Graph::Update(const RenderConfig &config)
     SDL_RenderClear(renderer);
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
-
+    
+    std::cout << "\n\n";
     for (auto &x : graphs)
     {
+        std::cout << "Looping through graph\n";
         // render the title of the graph somewhere
 
         const double min = config.GetMin();
@@ -199,7 +203,7 @@ void Graph::Update(const RenderConfig &config)
     mouse.Update(Vec2(x, y), l, m, r);
 }
 
-void Graph::Insert(double y)
+void Graph::Update(double y)
 {
     for (auto& x : graphs)
         x.Update(y);
