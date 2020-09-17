@@ -6,33 +6,71 @@ Filter design credits: Sam Belliveau
 
 #include "Timer.hpp"
 
-#include <queue>
+// deque not queue because queue doesnt have iterator (weird)
+#include <deque>
 #include <cstdint>
+
+#include <memory>
 
 namespace mp
 {
-    struct Filter
+    template <typename Base, typename Pointer = std::unique_ptr<Base>>
+    struct Cloneable
     {
-        virtual double operator()(double next) = 0;
-        // virtual ~Filter();
+        typedef Base BaseType;
+        typedef Pointer PointerType;
+
+        virtual Pointer clone() const = 0;
     };
 
-    struct LowPassFilter : public Filter
+    struct Filter : Cloneable<Filter>
+    {
+        virtual double operator()(double next) = 0;
+        
+        // Filter(const Filter&) = default;
+        // Filter& operator=(const Filter&) = default;
+
+        Filter();
+        virtual ~Filter();
+
+        // virtual PointerType clone() = 0;
+
+    };
+
+    struct NoFilter final : public Filter
+    {
+        NoFilter();
+        ~NoFilter();
+
+        double operator()(double next) override;
+        PointerType clone() const override;
+
+    };
+
+    struct LowPassFilter final : public Filter
     {
         LowPassFilter(double rc);
-        virtual double operator()(double next) override;
+        ~LowPassFilter();
+
+        double operator()(double next) override;
+        PointerType clone() const override;
+
     private:
         double rc; // const
         double last_value;
         Timer timer;
     };
 
-    struct MovingAverage : public Filter
+    struct MovingAverage final : public Filter
     {
         MovingAverage(std::size_t count);
-        virtual double operator()(double next) override; 
+        ~MovingAverage();
+
+        double operator()(double next) override; 
+        PointerType clone() const override;
+
     private:
-        std::queue<double> values;
+        std::deque<double> values;
         double total;
 
         std::size_t count;
