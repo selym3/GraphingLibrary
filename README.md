@@ -4,11 +4,11 @@ A simple graphing for continuous input streams
 
 ## Features
 
-* Abstractions to handle SDL initialization (not well supported) and user input
-* Graph data class to represent data
+* Filter classes to handle clone operations and filtering values
+* DataQueue class to wrap a queue of doubles with relevant information and limited size
+* SDL Implementation to display DataQueues and RenderConfig class to change how data is displayed
 
 ## TODO
 
-* Add filtered graph datas
-* Be able to create references to graph datas that you are passing into the graph
-* More secure SDL code & the pan and zooming needs work
+* Figure out GUI
+* Come up with test code to simulate how gui might work
