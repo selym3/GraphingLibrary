@@ -2,20 +2,9 @@
 
 using namespace mp;
 
-/*
-Filter design credits: Sam Belliveau
-*/
-
-Filter::Filter() {}
-Filter::~Filter() {}
-
 NoFilter::NoFilter() {}
 NoFilter::~NoFilter() {}
 double NoFilter::operator()(double next) { return next; }
-NoFilter::PointerType NoFilter::clone() const
-{
-    return NoFilter::PointerType(new NoFilter());
-}
 
 
 LowPassFilter::LowPassFilter(double rc): rc{rc} {}
@@ -26,10 +15,6 @@ double LowPassFilter::operator()(double next)
     return last_value += a * (next - last_value);
 }
 LowPassFilter::~LowPassFilter() {}
-LowPassFilter::PointerType LowPassFilter::clone() const
-{
-    return LowPassFilter::PointerType(new LowPassFilter(this->rc));
-}
 
 MovingAverage::MovingAverage(std::size_t count): count{count}, total{0.0}
 {
@@ -50,16 +35,42 @@ double MovingAverage::operator()(double next)
 
     return total / count;
 }
-MovingAverage::PointerType MovingAverage::clone() const
+
+TimedMovingAverage::TimedMovingAverage(double time)
+    : max_time { time },
+      total { 0.0 }, total_time { 0.0 }
 {
-    MovingAverage* m_ptr = new MovingAverage(this->count);
-    m_ptr->total = total;
 
-    for (const double& value : values)
-    {
-        m_ptr->values.pop_front();
-        m_ptr->values.push_back(value);
-    }
+}
 
-    return MovingAverage::PointerType(m_ptr);
+TimedMovingAverage::~TimedMovingAverage()
+{
+}
+
+void TimedMovingAverage::Add(double next)
+{
+    TimedMovingAverage::Value v ( next, timer.Poll() );
+    total += v.value;
+    total_time += v.time;
+    data.push_back(v);
+}
+
+void TimedMovingAverage::Remove()
+{
+    const TimedMovingAverage::Value v = data.front();
+    data.pop_front();
+
+    total -= v.value;
+    total_time -= v.time;
+}
+
+double TimedMovingAverage::operator()(double next)
+{
+    while (max_time < total_time)
+        Remove();
+
+    Add(next);
+
+    return (total_time > 0) * total / total_time; 
+
 }

@@ -1,79 +1,93 @@
 #ifndef __FILTER_HPP__
 
-/*
-Filter design credits: Sam Belliveau
-*/
-
 #include "Timer.hpp"
 
 // deque not queue because queue doesnt have iterator (weird)
 #include <deque>
 #include <cstdint>
 
-#include <memory>
+#include <functional>
 
 namespace mp
 {
-    template <typename Base, typename Pointer = std::unique_ptr<Base>>
-    struct Cloneable
+
+    using Filter = std::function<double(double)>;
+
+    Filter operator+(const Filter& a, const Filter& b)
     {
-        typedef Base BaseType;
-        typedef Pointer PointerType;
+        return [a, b](double next) { return b(a(next)); }
+    }
 
-        virtual Pointer clone() const = 0;
-    };
-
-    struct Filter : Cloneable<Filter>
-    {
-        virtual double operator()(double next) = 0;
-        
-        // Filter(const Filter&) = default;
-        // Filter& operator=(const Filter&) = default;
-
-        Filter();
-        virtual ~Filter();
-
-        // virtual PointerType clone() = 0;
-
-    };
-
-    struct NoFilter final : public Filter
+    struct NoFilter 
     {
         NoFilter();
         ~NoFilter();
 
-        double operator()(double next) override;
-        PointerType clone() const override;
-
+        double operator()(double next);
     };
 
-    struct LowPassFilter final : public Filter
+    struct LowPassFilter
     {
         LowPassFilter(double rc);
         ~LowPassFilter();
 
-        double operator()(double next) override;
-        PointerType clone() const override;
+        double operator()(double next);
 
     private:
-        double rc; // const
+        double rc;
         double last_value;
         Timer timer;
     };
 
-    struct MovingAverage final : public Filter
+    struct MovingAverage
     {
         MovingAverage(std::size_t count);
         ~MovingAverage();
 
-        double operator()(double next) override; 
-        PointerType clone() const override;
+        double operator()(double next); 
 
     private:
         std::deque<double> values;
         double total;
 
         std::size_t count;
+    };
+
+    struct Value
+    {
+        double value, time;
+
+        Value(double v, double t) : value { v * t } , time { t }
+        {
+        }
+
+    };
+
+    struct TimedMovingAverage
+    {
+        using Value = Value;
+
+        TimedMovingAverage(double time);
+        ~TimedMovingAverage();
+
+        double operator()(double next);
+    private:
+        void Remove();
+        void Add(double next);
+
+        // timer
+        mp::Timer timer;
+        
+        // running totals
+        double total;
+        double total_time;
+        
+        // max timeout
+        double max_time;
+
+        // data buffer
+        std::deque<Value> data;
+
     };
 
 }

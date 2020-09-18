@@ -22,22 +22,21 @@ class DataQueue
 
     using Size = std::size_t;
     using Queue = std::deque<double>; // std::queue<double>;
-    using FilterPtr = std::unique_ptr<Filter>;
 
     Queue _data;
     Size capacity;
 
     double default_value;
 
-    FilterPtr filter;
+    Filter filter;
 
 public: 
 
-    DataQueue(Size capacity, Filter* filter = new NoFilter(), double default_value = 0.0);
+    DataQueue(Size capacity, Filter filter, double default_value = 0.0);
     ~DataQueue();
 
-    DataQueue(const DataQueue&);
-    DataQueue& operator=(const DataQueue&);
+    DataQueue(const DataQueue&) = default;
+    DataQueue& operator=(const DataQueue&) = default;
 
     void Update(double next);
 

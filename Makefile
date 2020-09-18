@@ -9,6 +9,3 @@ compile-all:
 	clang++ impl/Keyboard.cpp -c -o bin/Keyboard.o
 	clang++ impl/Filter.cpp -c -o bin/Filter.o
 	clang++ impl/DataBuffer.cpp -c -o bin/DataBuffer.o
-
-main:
-	clang++ main.cpp bin/*.o -lSDL2 -lm -o main

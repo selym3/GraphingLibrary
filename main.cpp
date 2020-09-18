@@ -6,62 +6,16 @@
 int main(void)
 {
 
-    struct DivFilter final : mp::Filter
-    {
-        double divisor;
-
-        DivFilter(double div_by) : divisor { (div_by == 0) + div_by } {}
-        ~DivFilter() {}    
-
-        double operator()(double next) { return next / divisor; }
-
-        PointerType clone() const
-        {
-            return std::unique_ptr<Filter>(new DivFilter(divisor));
-        }
-    };
-
-    auto signum = [](double n) 
-    {
-        return (n > 0) - (n < 0);
-    };
-
-    struct SquareFilter final : mp::Filter
-    {
-        SquareFilter(){}
-        ~SquareFilter(){}
-
-        double operator()(double next) { return next * next * (next > 0) - (next < 0); }
-
-        PointerType clone() const
-        {
-            return std::unique_ptr<Filter>(new SquareFilter());
-        }
-    };
-
-    struct CubeFilter final : mp::Filter
-    {
-        CubeFilter(){}
-        ~CubeFilter(){}
-
-        double operator()(double next) { return next * next * next; }
-
-        PointerType clone() const
-        {
-            return std::unique_ptr<Filter>(new CubeFilter());
-        }
-    };
-
-
     mp::Graph graph
     (
         "Graphing Title", 600,600, 
 
         {
 
-        mp::DataQueue(200),
-        mp::DataQueue(200, new SquareFilter()),
-        mp::DataQueue(200, new CubeFilter())
+        mp::DataQueue(200, [](double x) { return x; }),
+        // mp::DataQueue(200, mp::MovingAverage(24)),
+        mp::DataQueue(200, mp::TimedMovingAverage(10.0))
+        // mp::DataQueue(200, mp::LowPassFilter(0.5))
         
         }
     );
