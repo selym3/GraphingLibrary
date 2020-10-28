@@ -1,4 +1,5 @@
 #ifndef __FILTER_HPP__
+#define __FILTER_HPP__
 
 #include "Timer.hpp"
 
@@ -13,10 +14,7 @@ namespace mp
 
     using Filter = std::function<double(double)>;
 
-    Filter operator+(const Filter& a, const Filter& b)
-    {
-        return [a, b](double next) { return b(a(next)); }
-    }
+    mp::Filter operator+(const mp::Filter &a, const mp::Filter &b);
 
     struct NoFilter 
     {

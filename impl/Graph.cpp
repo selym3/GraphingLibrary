@@ -3,7 +3,6 @@
 
 #include <sstream>
 
-#include <iostream>
 #include <cmath>
 
 using namespace mp;
@@ -61,7 +60,6 @@ Graph::Graph(const std::string &title, unsigned int WIDTH, unsigned int HEIGHT, 
 
     graphs = data;
 
-    // std::cout << "length of graphs : " << graphs.size() << "\n";
 }
 
 Graph::~Graph()
@@ -155,11 +153,8 @@ void Graph::Render(const RenderConfig &config)
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     
-    std::cout << "\n\n";
     for (auto &x : graphs)
     {
-        std::cout << "Looping through graph\n";
-        // render the title of the graph somewhere
 
         const double min = config.GetMin();
         const double absolute_min = min * ((min > 0) - (min < 0));
@@ -186,7 +181,7 @@ void Graph::Render(const RenderConfig &config)
             SDL_FRect to_draw = {(float)current_x - 4, (float)current_y - 4, 8, 8};
             to_draw = camera(to_draw);
 
-            SDL_RenderDrawRectF(renderer, &to_draw);
+            // SDL_RenderDrawRectF(renderer, &to_draw);
             SDL_RenderDrawLineF(renderer, (float)current.x, (float)current.y, (float)last.x, (float)last.y);
 
             last_x = current_x;

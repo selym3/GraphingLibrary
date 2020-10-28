@@ -2,10 +2,14 @@
 
 using namespace mp;
 
+mp::Filter mp::operator+(const mp::Filter& a, const mp::Filter& b)
+{
+    return [a, b](double next) { return b(a(next)); };
+}
+
 NoFilter::NoFilter() {}
 NoFilter::~NoFilter() {}
 double NoFilter::operator()(double next) { return next; }
-
 
 LowPassFilter::LowPassFilter(double rc): rc{rc} {}
 double LowPassFilter::operator()(double next)

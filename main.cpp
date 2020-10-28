@@ -1,3 +1,4 @@
+
 #include "headers/Graph.hpp"
 #include <iostream>
 
@@ -13,15 +14,17 @@ int main(void)
         {
 
         mp::DataQueue(200, [](double x) { return x; }),
-        // mp::DataQueue(200, mp::MovingAverage(24)),
-        mp::DataQueue(200, mp::TimedMovingAverage(10.0))
-        // mp::DataQueue(200, mp::LowPassFilter(0.5))
+        mp::DataQueue(200, mp::TimedMovingAverage(1.0)),
+        mp::DataQueue(200, mp::LowPassFilter(0.5)),
+        mp::DataQueue(200, mp::LowPassFilter(0.5) + mp::TimedMovingAverage(1.0))
         
         }
     );
 
     // mp::DataQueue copy_constructor(200, new mp::MovingAverage(24), 0.0);
     /*
+    Cannnot pan zoom unless right button is clicked at least once 
+
     TODO:
         - Add filtering for graph datas
         - Add rendering configurations for graph data
@@ -39,7 +42,7 @@ int main(void)
     
     mp::Timer timer;
     bool is_inserting = false;
-
+    
     const auto config = mp::RenderConfig(0, 1);
 
     while (graph.IsRunning())
